@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Queue System Sprint 3</string>
+    <string name="title_home">Queue</string>
+    <string name="title_dashboard">TA</string>
+    <string name="title_notifications">Calendar</string>
+</resources>

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "243987498790",
+    "firebase_url": "https://kad-mobile-apps-project-default-rtdb.firebaseio.com",
+    "project_id": "kad-mobile-apps-project",
+    "storage_bucket": "kad-mobile-apps-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243987498790:android:47eacca02aa3be8bfd23e7",
+        "android_client_info": {
+          "package_name": "com.example.queuesystemsprint3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243987498790-nldks5doui8e7vo2n297sem6e41d54v8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa9BvMfGDOhc64fiArntH9-yVgAAiyftI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243987498790-495b7ejvfdh1t8qkobs4m2m2kebbsi28.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243987498790:android:5f895352f250fdf5fd23e7",
+        "android_client_info": {
+          "package_name": "com.example.quueesystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243987498790-nldks5doui8e7vo2n297sem6e41d54v8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa9BvMfGDOhc64fiArntH9-yVgAAiyftI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243987498790-495b7ejvfdh1t8qkobs4m2m2kebbsi28.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
