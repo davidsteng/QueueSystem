@@ -14,8 +14,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.queuesystemsprint3.MainActivity;
+import com.example.queuesystemsprint3.R;
 import com.example.queuesystemsprint3.databinding.FragmentHomeBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -102,6 +104,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onClick(View view) {
                 System.out.println("Join Queue Button Flag");
+
                 String dropdownSelect = courseDropdown.getSelectedItem().toString();
                 //If Spinner empty exit the button input
                 if(dropdownSelect == null) {
@@ -109,6 +112,8 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
                     return;
                 }
                 joinQueue(userID, dropdownSelect);
+                // Added navigation to in_queue fragment
+                Navigation.findNavController(view).navigate(R.id.navigation_queue);
             }
         });
         //End

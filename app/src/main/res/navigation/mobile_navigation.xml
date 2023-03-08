@@ -9,7 +9,14 @@
         android:id="@+id/navigation_home"
         android:name="com.example.queuesystemsprint3.ui.queue.QueueFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_queue"
+            app:destination="@id/navigation_queue" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -22,4 +29,9 @@
         android:name="com.example.queuesystemsprint3.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/navigation_queue"
+        android:name="com.example.queuesystemsprint3.ui.in_queue.InQueueFragment"
+        android:label="fragment_queue"
+        tools:layout="@layout/fragment_in_queue" />
 </navigation>

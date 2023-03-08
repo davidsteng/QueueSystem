@@ -3,4 +3,6 @@
     <string name="title_home">Queue</string>
     <string name="title_dashboard">TA</string>
     <string name="title_notifications">Calendar</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
