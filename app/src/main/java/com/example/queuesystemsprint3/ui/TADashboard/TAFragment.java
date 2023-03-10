@@ -102,7 +102,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                     if(TAcourseID != null) {
                         DocumentReference studentDoc = db.collection("Students")
                                 .document(userID);
-                        studentDoc.update("isTAFor", FieldValue.arrayUnion(TAcourseID));
+                        studentDoc.update("isTAFor", TAcourseID);
                     }
                 }
             });
