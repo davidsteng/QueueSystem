@@ -117,7 +117,7 @@ public class InQueueFragment extends Fragment{
 
                     //System.out.println(courseWaitlist);
 
-                    String x = Integer.toString(courseWaitlist.indexOf(userID));
+                    String x = Integer.toString(courseWaitlist.indexOf(userID) + 1);
                     queuePositionNum.setText(x);
                 }
             }
