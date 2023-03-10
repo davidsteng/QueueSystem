@@ -47,6 +47,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     private ListView QueueList;
 
     private String userID = "Test TA";
+    private String currTACourse;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -63,8 +64,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
         addTACourseButton.setOnClickListener(this::onClick);
 
         leaveTAQueueButton = binding.leaveTAQueueButton;
-        popButton = binding.popButton;
-
+        leaveTAQueueButton.setOnClickListener(this::onClick);
 
 
         return root;
@@ -78,7 +78,9 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        System.out.println(view.getId());
         enterTACourseText = binding.enterTACourseText;
+
         String stringEntry = enterTACourseText.getText().toString();
         // check if the entered TA Course code is an actual course code
         DocumentReference getTACourseIDs = db.collection("Courses")
@@ -89,22 +91,55 @@ public class TAFragment extends Fragment implements View.OnClickListener {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
 
-                }
-                    DocumentSnapshot document = task.getResult();
-                    Map<String, Object> tempMap = document.getData();
-                    Map<String, Object> TAcourseMap = (Map<String, Object>) tempMap.get("TAMap");
-                    String TAcourseID = null;
-                    if(stringEntry.toString() != null) {
-                        TAcourseID = (String) TAcourseMap.get(stringEntry.toString());
-                    }
-                    else return;
+                    switch (view.getId()) {
+                        case R.id.addTACourseButton:
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> tempMap = document.getData();
+                            Map<String, Object> TAcourseMap = (Map<String, Object>) tempMap.get("TAMap");
+                            String TAcourseID = null;
+                            if (stringEntry.toString() != null) {
+                                TAcourseID = (String) TAcourseMap.get(stringEntry.toString());
+                            } else return;
 
-                    if(TAcourseID != null) {
-                        DocumentReference studentDoc = db.collection("Students")
-                                .document(userID);
-                        studentDoc.update("isTAFor", TAcourseID);
+                            if (TAcourseID != null) {
+                                // add course to user's isTAFor
+                                DocumentReference studentDoc = db.collection("Students")
+                                        .document(userID);
+                                studentDoc.update("isTAFor", TAcourseID);
+                                currTACourse = TAcourseID;
+                                // add user as a TA for course
+                                DocumentReference courseDoc = db.collection("Courses")
+                                        .document(currTACourse);
+                                courseDoc.update("CourseList", FieldValue.arrayUnion(userID));
+                            }
+
+                            // TO DO: Make the queue viewable
+                        break;
+                        case R.id.leaveTAQueueButton:
+                            System.out.println("leavingTAQueue Button");
+                            // remove course to user's isTAFor
+                            DocumentReference studentDoc = db.collection("Students")
+                                    .document(userID);
+                            studentDoc.update("isTAFor", "");
+                            // remove user as a TA for course
+                            DocumentReference courseDoc = db.collection("Courses")
+                                    .document(currTACourse);
+                            // TO DO: Only remove from TA List of course if the user is already in
+                            // the TA list -- figure out how to do this
+                            courseDoc.update("CourseList", FieldValue.arrayRemove(userID));
+
+                            // TO DO: Make the queue unviewable
+                        break;
+                        case R.id.popButton:
+                        break;
+                        default:
+                            throw new RuntimeException("Unknown button ID");
                     }
+
                 }
-            });
-        }
+            }
+        });
+    }
+
+
 }
