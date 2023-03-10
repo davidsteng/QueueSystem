@@ -9,29 +9,23 @@
         android:id="@+id/navigation_home"
         android:name="com.example.queuesystemsprint3.ui.queue.QueueFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_queue"
-            app:destination="@id/navigation_queue" />
-        <action
-            android:id="@+id/action_navigation_home_to_navigation_dashboard"
-            app:destination="@id/navigation_dashboard" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.queuesystemsprint3.ui.dashboard.DashboardFragment"
+        android:name="com.example.queuesystemsprint3.ui.TADashboard.TAFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_ta" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.queuesystemsprint3.ui.notifications.NotificationsFragment"
+        android:name="com.example.queuesystemsprint3.ui.Calendar_Scheduling.CalendarFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_calendar" />
+
     <fragment
         android:id="@+id/navigation_queue"
         android:name="com.example.queuesystemsprint3.ui.in_queue.InQueueFragment"
-        android:label="fragment_queue"
+        android:label="In Queue"
         tools:layout="@layout/fragment_in_queue" />
 </navigation>

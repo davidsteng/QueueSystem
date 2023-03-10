@@ -1,4 +1,4 @@
-package com.example.queuesystemsprint3.ui.dashboard;
+package com.example.queuesystemsprint3.ui.TADashboard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,22 +10,21 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.queuesystemsprint3.databinding.FragmentDashboardBinding;
+import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
+import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
 
-public class DashboardFragment extends Fragment {
+public class TAFragment extends Fragment {
 
-    private FragmentDashboardBinding binding;
+    private FragmentTaBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        DashboardViewModel dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        TAViewModel TAViewModel =
+                new ViewModelProvider(this).get(TAViewModel.class);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
+        binding = FragmentTaBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

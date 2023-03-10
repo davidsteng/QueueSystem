@@ -1,5 +1,6 @@
 package com.example.queuesystemsprint3.ui.queue;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -83,7 +84,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
 
                     ArrayList<String> courseMapList = (ArrayList<String>) tempMapping.get("CourseList");
 
-                    System.out.println(courseMapList);
+                    //System.out.println(courseMapList);
 
                     Object[] courseMaps = courseMapList.toArray();
                     String[] courseMap = Arrays.stream(courseMaps).toArray(String[]::new);
@@ -103,8 +104,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
         joinQueueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Join Queue Button Flag");
-
+                //System.out.println("Join Queue Button Flag");
                 String dropdownSelect = courseDropdown.getSelectedItem().toString();
                 //If Spinner empty exit the button input
                 if(dropdownSelect == null) {
@@ -112,8 +112,11 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
                     return;
                 }
                 joinQueue(userID, dropdownSelect);
-                // Added navigation to in_queue fragment
-                Navigation.findNavController(view).navigate(R.id.navigation_queue);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("dearGodWork", dropdownSelect);
+
+                Navigation.findNavController(view).navigate(R.id.navigation_queue, bundle);
             }
         });
         //End
