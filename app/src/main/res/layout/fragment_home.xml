@@ -24,7 +24,6 @@
         android:id="@+id/addCourseButton"
         android:layout_width="250dp"
         android:layout_height="51dp"
-
         android:text="Add Course"
         app:layout_constraintBottom_toTopOf="@+id/courseDropdown"
         app:layout_constraintEnd_toEndOf="parent"
