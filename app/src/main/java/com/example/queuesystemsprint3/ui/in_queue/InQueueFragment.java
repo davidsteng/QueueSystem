@@ -79,7 +79,7 @@ public class InQueueFragment extends Fragment{
 
     private String CHANNEL_ID = "1";
 
-    private String notification_title = "Queue App Notification";
+    private String notification_title = "CS 2050 Queue Notification";
     private String notification_content = userID + ", you are at the top of the queue for " + courseID;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -122,7 +122,7 @@ public class InQueueFragment extends Fragment{
                     String x = Integer.toString(courseWaitlist.indexOf(userID));
                     queuePositionNum.setText(x);
 
-                    if (courseWaitlist.indexOf(userID) == 1) {
+                    if (courseWaitlist.indexOf(userID) == -1) {
                         createNotificationIntent();
                     }
                 }
@@ -147,7 +147,7 @@ public class InQueueFragment extends Fragment{
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
                 .setContentTitle(notification_title)
                 .setContentText(notification_content)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("CS 2050 has an available TA. "))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
