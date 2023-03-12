@@ -137,7 +137,6 @@ public class InQueueFragment extends Fragment{
         //InQueueModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
-
     private void createNotificationIntent() {
         Intent intent = new Intent(this.getContext(), InQueueFragment.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
