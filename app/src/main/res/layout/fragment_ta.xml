@@ -9,12 +9,25 @@
     <ListView
         android:id="@+id/QueueList"
         android:layout_width="409dp"
-        android:layout_height="383dp"
+        android:layout_height="393dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </ListView>
+
+
+<!--    <TextView-->
+<!--        android:layout_width="409dp"-->
+<!--        android:layout_height="180dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/QueueList"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="1.0"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
 
     <Button
         android:id="@+id/leaveTAQueueButton"

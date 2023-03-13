@@ -20,10 +20,14 @@ import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
 import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +48,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
     private EditText enterTACourseText;
 
-    private ListView QueueList;
+    private TextView queueList;
 
     private String userID = "Test TA";
     private String currTACourse;
@@ -66,7 +70,6 @@ public class TAFragment extends Fragment implements View.OnClickListener {
         leaveTAQueueButton = binding.leaveTAQueueButton;
         leaveTAQueueButton.setOnClickListener(this::onClick);
 
-
         return root;
     }
 
@@ -74,6 +77,30 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        queueList = (TextView) view.findViewById(R.id.QueueList);
+
+        getQueueList();
+    }
+
+    public void getQueueList() {
+
+        DocumentReference getCourseInfo = db.collection("Courses")
+                .document("CS2050");
+        getCourseInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+                    System.out.println(list);
+                    queueList.setText((String) list.get(0));
+                }
+            }
+        });
     }
 
     @Override
