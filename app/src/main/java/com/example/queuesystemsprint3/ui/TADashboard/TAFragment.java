@@ -1,5 +1,6 @@
 package com.example.queuesystemsprint3.ui.TADashboard;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -32,6 +34,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 public class TAFragment extends Fragment implements View.OnClickListener {
 
@@ -70,6 +73,9 @@ public class TAFragment extends Fragment implements View.OnClickListener {
         leaveTAQueueButton = binding.leaveTAQueueButton;
         leaveTAQueueButton.setOnClickListener(this::onClick);
 
+        popButton = binding.popButton;
+        popButton.setOnClickListener(this::onClickPop);
+
         return root;
     }
 
@@ -101,6 +107,34 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
+    }
+
+    public void onClickPop(View view) {
+        DocumentReference getCourseInfo = db.collection("Courses")
+                .document("CS2050");
+        getCourseInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+                    System.out.println(list);
+                    String firstInList = (String) list.get(0);
+
+                    //Updating new list
+                    getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
+
+                    // Display student at top of queue
+                    Context context = requireActivity().getApplicationContext();
+                    CharSequence text = firstInList + " has been popped from the queue!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                }
+            }
+        });
+
     }
 
     @Override
@@ -158,6 +192,23 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                             // TO DO: Make the queue unviewable
                         break;
                         case R.id.popButton:
+                            DocumentReference getCourseInfo = db.collection("Courses")
+                                    .document("CS2050");
+                            ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+
+                            String firstInList = (String) list.remove(0);
+                            System.out.println("First in list " + firstInList);
+
+                            //Updating new list
+                            getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
+
+                            // Display student at top of queue
+                            Context context = requireActivity().getApplicationContext();
+                            CharSequence text = firstInList + " has been popped from the queue!";
+                            int duration = Toast.LENGTH_SHORT;
+
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
                         break;
                         default:
                             throw new RuntimeException("Unknown button ID");
