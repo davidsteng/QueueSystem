@@ -53,6 +53,8 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
     private TextView queueList;
 
+    private TextView currentClassTAText;
+
     private String userID = "Test TA";
     private String currTACourse;
 
@@ -91,6 +93,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
         queueList = (TextView) view.findViewById(R.id.QueueList);
 
         getQueueList();
+        //getCurrentTAClass();
     }
 
     public void getQueueList() {
@@ -107,6 +110,37 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                         queueList.setText(R.string.queueEmpty);
                     } else {
                         queueList.setText((String) list.get(0));
+                    }
+
+                }
+            }
+        });
+    }
+
+    public void getCurrentTAClass() {
+        //currentClassTAText = binding.currentClassTAText;
+        System.out.println("entered method");
+        DocumentReference getTAInfo = db.collection("Students")
+                .document("userID");
+
+        getTAInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    // need to figure out this method...
+                    System.out.println("task successful");
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> tempMapping = document.getData();
+                    String isTAFor = (String) tempMapping.get("isTAFor");
+                    System.out.println(isTAFor);
+
+
+                    if (isTAFor != null) {
+                        currentClassTAText.setText(isTAFor);
+                        System.out.println("set text");
+                    } else {
+                        currentClassTAText.setText(" ");
+
                     }
 
                 }
@@ -161,6 +195,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         System.out.println(view.getId());
         enterTACourseText = binding.enterTACourseText;
+        currentClassTAText = binding.currentClassTAText;
 
         String stringEntry = enterTACourseText.getText().toString();
         // check if the entered TA Course code is an actual course code
@@ -192,7 +227,9 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                                 DocumentReference courseDoc = db.collection("Courses")
                                         .document(currTACourse);
                                 courseDoc.update("CourseList", FieldValue.arrayUnion(userID));
+                                currentClassTAText.setText(currTACourse);
                             }
+                            enterTACourseText.setText("");
 
                             // TO DO: Make the queue viewable
                         break;
@@ -202,6 +239,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                             DocumentReference studentDoc = db.collection("Students")
                                     .document(userID);
                             studentDoc.update("isTAFor", "");
+                            studentDoc.update("isTA", false);
                             // remove user as a TA for course
                             DocumentReference courseDoc = db.collection("Courses")
                                     .document(currTACourse);

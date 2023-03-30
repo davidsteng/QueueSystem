@@ -10,25 +10,29 @@
         android:id="@+id/QueueList"
         android:layout_width="409dp"
         android:layout_height="393dp"
+        android:lineSpacingExtra="10sp"
+        android:textAlignment="textStart"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.677">
 
 
     </TextView>
 
     <Button
         android:id="@+id/leaveTAQueueButton"
-        android:layout_width="157dp"
-        android:layout_height="64dp"
-        android:text="Leave"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="191dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="15dp"
+        android:text="Leave queue"
+        app:layout_constraintBottom_toTopOf="@+id/currentClassTAText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enterTACourseCode"
-        app:layout_constraintVertical_bias="0.967" />
+        app:layout_constraintTop_toBottomOf="@+id/enterTACourseText" />
 
     <EditText
         android:id="@+id/enterTACourseText"
@@ -48,21 +52,47 @@
         android:id="@+id/popButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remove from Queue"
-        app:layout_constraintBottom_toTopOf="@+id/popButton"
+        android:layout_marginTop="4dp"
+        android:text="Remove student from Queue"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/QueueList"
-        app:layout_constraintVertical_bias="0.615" />
+        app:layout_constraintVertical_bias="0.087" />
 
     <Button
         android:id="@+id/addTACourseButton"
+        android:layout_width="177dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="15dp"
+        android:text="Join queue as TA"
+        app:layout_constraintBottom_toTopOf="@+id/currentTAText"
+        app:layout_constraintEnd_toStartOf="@+id/leaveTAQueueButton"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enterTACourseText" />
+
+    <TextView
+        android:id="@+id/currentTAText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add TA Course"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="27dp"
+        android:text="Currently TAing for:"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/QueueList"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/currentClassTAText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="27dp"
+        android:text="CS2050"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/QueueList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enterTACourseCode" />
+        app:layout_constraintStart_toEndOf="@+id/currentTAText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
