@@ -107,6 +107,7 @@ public class InQueueFragment extends Fragment{
                     Map<String, Object> studentQueueUpdate = new HashMap<>();
                     studentQueueUpdate.put("inQueue", false);
                     studentQueueUpdate.put("inQueueFor", "");
+                    studentQueueUpdate.put("reason", "");
                     studentQueueExit.set(studentQueueUpdate, SetOptions.merge());
 
                     courseQueueExit.update("CourseQueue", FieldValue.arrayRemove(userID));

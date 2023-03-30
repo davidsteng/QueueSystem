@@ -49,6 +49,8 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
     private Button joinQueueButton;
     //Course Dropdown Selector
     private Spinner courseDropdown;
+    //Reason Dropdown Selector
+    private Spinner reasonDropdown;
     //The entire fucking database. Do not alter bad things
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -96,6 +98,33 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             }
         });
 
+        reasonDropdown = binding.reasonDropdown;
+        DocumentReference getReasonDropdown = db.collection("Courses")
+                .document("ReasonList");
+        getReasonDropdown.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    Map<String, Object> tempMapping = document.getData();
+
+                    //System.out.println(document);
+                    //System.out.println(tempMapping);
+
+                    ArrayList<String> courseMapList = (ArrayList<String>) tempMapping.get("ReasonListArray");
+
+                    //System.out.println(courseMapList);
+
+                    Object[] courseMaps = courseMapList.toArray();
+                    String[] courseMap = Arrays.stream(courseMaps).toArray(String[]::new);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                            android.R.layout.simple_spinner_item, courseMap);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    reasonDropdown.setAdapter(adapter);
+                }
+            }
+        });
+
         joinQueueButton = binding.joinQueueButton;
 
         //Can I do it like this without crashing
@@ -106,12 +135,13 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             public void onClick(View view) {
                 //System.out.println("Join Queue Button Flag");
                 String dropdownSelect = courseDropdown.getSelectedItem().toString();
+                String dropdownReasonSelect = reasonDropdown.getSelectedItem().toString();
                 //If Spinner empty exit the button input
-                if(dropdownSelect == null) {
+                if(dropdownSelect == null || dropdownReasonSelect == null) {
                     //Insert torch response?
                     return;
                 }
-                joinQueue(userID, dropdownSelect);
+                joinQueue(userID, dropdownSelect, dropdownReasonSelect);
 
                 Bundle bundle = new Bundle();
                 bundle.putString("dearGodWork", dropdownSelect);
@@ -125,11 +155,12 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
     }
 
     //Method to connect to join queue button
-    public void joinQueue(String userID, String CourseID) {
+    public void joinQueue(String userID, String CourseID, String reason) {
         if(CourseID == null) return;
         Map<String, Object> studentQueueUpdate = new HashMap<>();
         studentQueueUpdate.put("inQueue", true);
         studentQueueUpdate.put("inQueueFor", CourseID);
+        studentQueueUpdate.put("reason", reason);
         db.collection("Students").document(userID)
                 .set(studentQueueUpdate, SetOptions.merge());
         DocumentReference courseQueueUpdate = db.collection("Courses")
