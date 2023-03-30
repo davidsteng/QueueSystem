@@ -103,7 +103,12 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                 if (task.isSuccessful()) {
                     ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
                     System.out.println(list);
-                    queueList.setText((String) list.get(0));
+                    if (Objects.requireNonNull(list).size() == 0) {
+                        queueList.setText(R.string.queueEmpty);
+                    } else {
+                        queueList.setText((String) list.get(0));
+                    }
+
                 }
             }
         });
@@ -117,24 +122,39 @@ public class TAFragment extends Fragment implements View.OnClickListener {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+                    CharSequence text;
                     System.out.println(list);
-                    String firstInList = (String) list.get(0);
-
-                    //Updating new list
-                    getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
-
+                    if (Objects.requireNonNull(list).size() == 0) {
+                         text = "There are no students in the queue!";
+                    } else {
+                        String firstInList = (String) list.get(0);
+                        //Updating new list
+                        getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
+                        text = firstInList + " has been popped from the queue!";
+                    }
                     // Display student at top of queue
                     Context context = requireActivity().getApplicationContext();
-                    CharSequence text = firstInList + " has been popped from the queue!";
                     int duration = Toast.LENGTH_SHORT;
-
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
+
+//                    //Remove queue from student's end of the DB
+//                    DocumentReference getStudentInfo = db.collection("Students")
+//                            .document(firstInList);
+//
+//                    getStudentInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                getStudentInfo.update("inQueue", false);
+//                                getStudentInfo.update("inQueueFor", "");
+//                            }
+//                        }
+//                    });
 
                 }
             }
         });
-
     }
 
     @Override
