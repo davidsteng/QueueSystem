@@ -2,7 +2,8 @@ package com.example.queuesystemsprint3.ui.in_queue;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-
+import java.util.Calendar;
+import java.util.Date;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,7 +109,6 @@ public class InQueueFragment extends Fragment{
                     Map<String, Object> studentQueueUpdate = new HashMap<>();
                     studentQueueUpdate.put("inQueue", false);
                     studentQueueUpdate.put("inQueueFor", "");
-                    studentQueueUpdate.put("reason", "");
                     studentQueueExit.set(studentQueueUpdate, SetOptions.merge());
 
                     courseQueueExit.update("CourseQueue", FieldValue.arrayRemove(userID));
@@ -123,7 +124,7 @@ public class InQueueFragment extends Fragment{
         createNotificationChannel();
 
         DocumentReference getWaitlist = db.collection("Courses")
-                    .document(courseID);
+                .document(courseID);
 
 
 
@@ -136,11 +137,23 @@ public class InQueueFragment extends Fragment{
 
 
                     ArrayList<String> courseWaitlist = (ArrayList<String>) tempMapping.get("CourseQueue");
-
+                    System.out.println(tempMapping.get("AverageTimeWait"));
+                    int courseWaitTime = Integer.parseInt(tempMapping.get("AverageTimeWait").toString());
                     //System.out.println(courseWaitlist);
+                    System.out.println(courseWaitTime);
 
                     String x = Integer.toString(courseWaitlist.indexOf(userID) + 1);
-                    queuePositionNum.setText(x);
+                    if(courseWaitlist.indexOf(userID) + 1 != 0) {
+                        queuePositionNum.setText(x);
+                    }
+                    else{
+                        queuePositionNum.setText("Current");
+                    }
+
+                    //To Be Updated
+                    averageWaitTimeNum = binding.averageWaitTimeNum;
+                    String y = Integer.toString(courseWaitlist.indexOf(userID) * courseWaitTime);
+                    averageWaitTimeNum.setText(y);
 
                     if (courseWaitlist.indexOf(userID) == -1) {
                         createNotificationIntent();
@@ -149,12 +162,9 @@ public class InQueueFragment extends Fragment{
             }
         });
 
-        //To Be Updated
-        averageWaitTimeNum = binding.averageWaitTimeNum;
-
         //final TextView textView = binding.textInQueue;
         //InQueueModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-
+        handler.postDelayed(runnable, 5000);
         return root;
     }
     private void createNotificationIntent() {
@@ -226,9 +236,57 @@ public class InQueueFragment extends Fragment{
         });
     }
 
+    private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            DocumentReference getWaitlist = db.collection("Courses")
+                    .document(courseID);
+            getWaitlist.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        Map<String, Object> tempMapping = document.getData();
+
+
+                        ArrayList<String> courseWaitlist = (ArrayList<String>) tempMapping.get("CourseQueue");
+                        int courseWaitTime = Integer.parseInt(tempMapping.get("AverageTimeWait").toString());
+                        //System.out.println(courseWaitlist);
+                        System.out.println(courseWaitTime);
+
+                        String x = Integer.toString(courseWaitlist.indexOf(userID) + 1);
+                        if(courseWaitlist.indexOf(userID) + 1 != 0) {
+                            queuePositionNum.setText(x);
+                        }
+                        else{
+                            queuePositionNum.setText("Current");
+                        }
+
+                        //To Be Updated
+                        averageWaitTimeNum = binding.averageWaitTimeNum;
+                        if(courseWaitTime != 0) {
+                            String y = Integer.toString((int)(courseWaitlist.indexOf(userID) * courseWaitTime));
+                            averageWaitTimeNum.setText(y);
+                        }
+                        else {
+                            averageWaitTimeNum.setText("< 1 Minute");
+                        }
+
+                        if (!courseWaitlist.contains(userID)) {
+                            createNotificationIntent();
+                            //Navigation.findNavController(view).navigate(R.id.navigation_home);
+                        }
+                    }
+                }
+            });
+        }
+    };
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 }
+

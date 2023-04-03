@@ -31,8 +31,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -226,7 +228,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                                 // add user as a TA for course
                                 DocumentReference courseDoc = db.collection("Courses")
                                         .document(currTACourse);
-                                courseDoc.update("CourseList", FieldValue.arrayUnion(userID));
+                                courseDoc.update("TAList", FieldValue.arrayUnion(userID));
                                 currentClassTAText.setText(currTACourse);
                             }
                             enterTACourseText.setText("");
@@ -243,9 +245,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                             // remove user as a TA for course
                             DocumentReference courseDoc = db.collection("Courses")
                                     .document(currTACourse);
-                            // TO DO: Only remove from TA List of course if the user is already in
-                            // the TA list -- figure out how to do this
-                            courseDoc.update("CourseList", FieldValue.arrayRemove(userID));
+                            courseDoc.update("TAList", FieldValue.arrayRemove(userID));
 
                             // TO DO: Make the queue unviewable
                         break;
@@ -259,6 +259,22 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
                             //Updating new list
                             getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
+
+                            //Funny Average Time Calc Method Do not remove
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                float temp = (float) Instant.now().getEpochSecond();
+                                Map <String, Float> finder = (Map<String, Float>) task.getResult().get("TimeWaitCalc");
+                                Map <String, Integer> finder2 = (Map<String, Integer>) task.getResult().get("QueueOnJoin");
+                                if(finder != null && firstInList != null && finder.get(firstInList) != null && finder2 != null) {
+                                    float joinTime = finder.get(firstInList).floatValue();
+                                    Integer joinpos = finder2.get(firstInList);
+                                    if (joinpos == null) {
+                                        break;
+                                    }
+                                    getCourseInfo.update("totalWaitTime", FieldValue.increment(temp - joinTime));
+                                    getCourseInfo.update("AverageTimeWait", (temp - joinTime) / 60 * joinpos.intValue());
+                                }
+                            }
 
                             // Display student at top of queue
                             Context context = requireActivity().getApplicationContext();

@@ -1,6 +1,7 @@
 package com.example.queuesystemsprint3.ui.queue;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,11 +31,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ServerTimestamp;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firestore.v1.WriteResult;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,8 +53,6 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
     private Button joinQueueButton;
     //Course Dropdown Selector
     private Spinner courseDropdown;
-    //Reason Dropdown Selector
-    private Spinner reasonDropdown;
     //The entire fucking database. Do not alter bad things
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -98,33 +100,6 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        reasonDropdown = binding.reasonDropdown;
-        DocumentReference getReasonDropdown = db.collection("Courses")
-                .document("ReasonList");
-        getReasonDropdown.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    Map<String, Object> tempMapping = document.getData();
-
-                    //System.out.println(document);
-                    //System.out.println(tempMapping);
-
-                    ArrayList<String> courseMapList = (ArrayList<String>) tempMapping.get("ReasonListArray");
-
-                    //System.out.println(courseMapList);
-
-                    Object[] courseMaps = courseMapList.toArray();
-                    String[] courseMap = Arrays.stream(courseMaps).toArray(String[]::new);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                            android.R.layout.simple_spinner_item, courseMap);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    reasonDropdown.setAdapter(adapter);
-                }
-            }
-        });
-
         joinQueueButton = binding.joinQueueButton;
 
         //Can I do it like this without crashing
@@ -135,13 +110,12 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             public void onClick(View view) {
                 //System.out.println("Join Queue Button Flag");
                 String dropdownSelect = courseDropdown.getSelectedItem().toString();
-                String dropdownReasonSelect = reasonDropdown.getSelectedItem().toString();
                 //If Spinner empty exit the button input
-                if(dropdownSelect == null || dropdownReasonSelect == null) {
+                if(dropdownSelect == null) {
                     //Insert torch response?
                     return;
                 }
-                joinQueue(userID, dropdownSelect, dropdownReasonSelect);
+                joinQueue(userID, dropdownSelect);
 
                 Bundle bundle = new Bundle();
                 bundle.putString("dearGodWork", dropdownSelect);
@@ -155,17 +129,36 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
     }
 
     //Method to connect to join queue button
-    public void joinQueue(String userID, String CourseID, String reason) {
+    public void joinQueue(String userID, String CourseID) {
         if(CourseID == null) return;
         Map<String, Object> studentQueueUpdate = new HashMap<>();
         studentQueueUpdate.put("inQueue", true);
         studentQueueUpdate.put("inQueueFor", CourseID);
-        studentQueueUpdate.put("reason", reason);
         db.collection("Students").document(userID)
                 .set(studentQueueUpdate, SetOptions.merge());
         DocumentReference courseQueueUpdate = db.collection("Courses")
                 .document(CourseID);
         courseQueueUpdate.update("CourseQueue", FieldValue.arrayUnion(userID));
+        courseQueueUpdate.update("totalQueueSize", FieldValue.increment(1));
+        Map<String, Object> addTimeWait = new HashMap<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            addTimeWait.put(userID, Instant.now().getEpochSecond());
+            courseQueueUpdate.update("TimeWaitCalc", addTimeWait);
+            courseQueueUpdate.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentReference getCourseInfo = db.collection("Courses")
+                                .document(CourseID);
+                        Integer pos = (Integer) task.getResult().get("totalQueueSize");
+                        Map<String, Object> QueueSize = new HashMap<>();
+                        QueueSize.put(userID, pos);
+                        courseQueueUpdate.update("QueueOnJoin", QueueSize);
+                    }
+                }
+            });
+        }
+        System.out.println("I did not crash");
     }
 
     @Override
