@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -58,7 +58,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     private TextView currentClassTAText;
 
     private String userID = "Test TA";
-    private String currTACourse;
+    private String currTACourse = "CS8001";
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -67,6 +67,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                              ViewGroup container, Bundle savedInstanceState) {
         TAViewModel TAViewModel =
                 new ViewModelProvider(this).get(TAViewModel.class);
+        System.out.println("on create view");
 
         binding = FragmentTaBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -80,8 +81,17 @@ public class TAFragment extends Fragment implements View.OnClickListener {
         popButton = binding.popButton;
         popButton.setOnClickListener(this::onClickPop);
 
+        handler.postDelayed(runnable, 5000);
         return root;
     }
+
+    private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            getQueueList(currTACourse);
+        }
+    };
 
     @Override
     public void onDestroyView() {
@@ -92,28 +102,44 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        System.out.println("onview created");
         queueList = (TextView) view.findViewById(R.id.QueueList);
+        System.out.println("just created queue!");
 
-        getQueueList();
+        getQueueList(currTACourse);
         //getCurrentTAClass();
     }
 
-    public void getQueueList() {
+    public void getQueueList(String classname) {
 
         DocumentReference getCourseInfo = db.collection("Courses")
-                .document("CS2050");
+                .document(classname);
         getCourseInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
-                    System.out.println(list);
-                    if (Objects.requireNonNull(list).size() == 0) {
-                        queueList.setText(R.string.queueEmpty);
+                    if (classname == "CS8001") {
+                        System.out.println("not TA");
+                        queueList.setText("You are not currently TAing for a course. \n Please enter your TA course code.");
                     } else {
-                        queueList.setText((String) list.get(0));
-                    }
+                        System.out.println("are TA");
+                        ArrayList studentList = (ArrayList) task.getResult().get("CourseQueue");
 
+                        ArrayList reasonList = (ArrayList) task.getResult().get("CourseReasonQueue");
+
+                        if (Objects.requireNonNull(studentList).size() == 0 && Objects.requireNonNull(reasonList).size() == 0 ) {
+                            queueList.setText(R.string.queueEmpty);
+                        } else {
+                            String queueNames = "";
+                            for (int i = 0; i < studentList.size(); i++) {
+                                queueNames += (String) studentList.get(i) +" : "  + reasonList.get(i) + "\n";
+
+                            }
+                            String reasons = "";
+
+                            queueList.setText(queueNames);
+                        }
+                    }
                 }
             }
         });
@@ -151,46 +177,54 @@ public class TAFragment extends Fragment implements View.OnClickListener {
     }
 
     public void onClickPop(View view) {
-        DocumentReference getCourseInfo = db.collection("Courses")
-                .document("CS2050");
-        getCourseInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
-                    CharSequence text;
-                    System.out.println(list);
-                    if (Objects.requireNonNull(list).size() == 0) {
-                         text = "There are no students in the queue!";
-                    } else {
-                        String firstInList = (String) list.get(0);
-                        //Updating new list
-                        getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
-                        text = firstInList + " has been popped from the queue!";
+        if (currTACourse != "") {
+            DocumentReference getCourseInfo = db.collection("Courses")
+                    .document(currTACourse);
+            getCourseInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+                        ArrayList reasonList = (ArrayList) task.getResult().get("CourseReasonQueue");
+                        CharSequence text;
+                        System.out.println(list);
+                        if (Objects.requireNonNull(list).size() == 0) {
+                             text = "There are no students in the queue!";
+                        } else {
+                            String firstInList = (String) list.get(0);
+                            String firstReasonInList = (String) reasonList.get(0);
+
+                                    //Updating new list
+                            getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
+                            text = firstInList + " has been popped from the queue!";
+                            getCourseInfo.update("CourseReasonQueue", FieldValue.arrayRemove(firstReasonInList));
+
+                        }
+                        // Display student at top of queue
+                        Context context = requireActivity().getApplicationContext();
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                        getQueueList(currTACourse);
+
+    //                    //Remove queue from student's end of the DB
+    //                    DocumentReference getStudentInfo = db.collection("Students")
+    //                            .document(firstInList);
+    //
+    //                    getStudentInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    //                        @Override
+    //                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+    //                            if (task.isSuccessful()) {
+    //                                getStudentInfo.update("inQueue", false);
+    //                                getStudentInfo.update("inQueueFor", "");
+    //                            }
+    //                        }
+    //                    });
+
                     }
-                    // Display student at top of queue
-                    Context context = requireActivity().getApplicationContext();
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-
-//                    //Remove queue from student's end of the DB
-//                    DocumentReference getStudentInfo = db.collection("Students")
-//                            .document(firstInList);
-//
-//                    getStudentInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                getStudentInfo.update("inQueue", false);
-//                                getStudentInfo.update("inQueueFor", "");
-//                            }
-//                        }
-//                    });
-
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -225,13 +259,16 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                                         .document(userID);
                                 studentDoc.update("isTAFor", TAcourseID);
                                 currTACourse = TAcourseID;
+                                System.out.println(currTACourse);
                                 // add user as a TA for course
                                 DocumentReference courseDoc = db.collection("Courses")
                                         .document(currTACourse);
+                                System.out.print(courseDoc);
                                 courseDoc.update("TAList", FieldValue.arrayUnion(userID));
                                 currentClassTAText.setText(currTACourse);
                             }
                             enterTACourseText.setText("");
+                            getQueueList(currTACourse);
 
                             // TO DO: Make the queue viewable
                         break;
@@ -246,26 +283,32 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                             DocumentReference courseDoc = db.collection("Courses")
                                     .document(currTACourse);
                             courseDoc.update("TAList", FieldValue.arrayRemove(userID));
+                            currTACourse = "CS8001";
+                            getQueueList(currTACourse);
+                            currentClassTAText.setText("None");
 
                             // TO DO: Make the queue unviewable
                         break;
                         case R.id.popButton:
+                            if (currTACourse != "") {
                             DocumentReference getCourseInfo = db.collection("Courses")
-                                    .document("CS2050");
+                                    .document(currTACourse);
                             ArrayList list = (ArrayList) task.getResult().get("CourseQueue");
+                            ArrayList reasonList = (ArrayList) task.getResult().get("CourseReasonQueue");
 
                             String firstInList = (String) list.remove(0);
                             System.out.println("First in list " + firstInList);
+                            String firstInReasonList = (String) reasonList.remove(0);
 
                             //Updating new list
                             getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
-
+                            getCourseInfo.update("CourseReasonQueue", FieldValue.arrayRemove(firstInReasonList));
                             //Funny Average Time Calc Method Do not remove
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                                 float temp = (float) Instant.now().getEpochSecond();
-                                Map <String, Float> finder = (Map<String, Float>) task.getResult().get("TimeWaitCalc");
-                                Map <String, Integer> finder2 = (Map<String, Integer>) task.getResult().get("QueueOnJoin");
-                                if(finder != null && firstInList != null && finder.get(firstInList) != null && finder2 != null) {
+                                Map<String, Float> finder = (Map<String, Float>) task.getResult().get("TimeWaitCalc");
+                                Map<String, Integer> finder2 = (Map<String, Integer>) task.getResult().get("QueueOnJoin");
+                                if (finder != null && firstInList != null && finder.get(firstInList) != null && finder2 != null) {
                                     float joinTime = finder.get(firstInList).floatValue();
                                     Integer joinpos = finder2.get(firstInList);
                                     if (joinpos == null) {
@@ -283,6 +326,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
                             Toast toast = Toast.makeText(context, text, duration);
                             toast.show();
+                            }
                         break;
                         default:
                             throw new RuntimeException("Unknown button ID");
