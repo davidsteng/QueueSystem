@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.example.queuesystemsprint3.MainActivity;
 import com.example.queuesystemsprint3.R;
 import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
 import com.example.queuesystemsprint3.databinding.FragmentTaBinding;
@@ -57,7 +58,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
     private TextView currentClassTAText;
 
-    private String userID = "Test TA";
+    private String userID;
     private String currTACourse = "CS8001";
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -80,6 +81,9 @@ public class TAFragment extends Fragment implements View.OnClickListener {
 
         popButton = binding.popButton;
         popButton.setOnClickListener(this::onClickPop);
+
+        userID = ((MainActivity) requireActivity()).getEmail();
+        System.out.println("Current email " + userID);
 
         handler.postDelayed(runnable, 5000);
         return root;
@@ -194,7 +198,7 @@ public class TAFragment extends Fragment implements View.OnClickListener {
                             String firstInList = (String) list.get(0);
                             String firstReasonInList = (String) reasonList.get(0);
 
-                                    //Updating new list
+                            //Updating new list
                             getCourseInfo.update("CourseQueue", FieldValue.arrayRemove(firstInList));
                             text = firstInList + " has been popped from the queue!";
                             getCourseInfo.update("CourseReasonQueue", FieldValue.arrayRemove(firstReasonInList));

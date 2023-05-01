@@ -14,7 +14,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -41,6 +43,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class QueueFragment extends Fragment implements View.OnClickListener{
 
@@ -60,7 +63,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
 
     //For testing purposes only, please delete when login implemented
     //Will access from login when needed
-    private String userID = "Test Student";
+    private String userID;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -75,9 +78,13 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
 
         courseDropdown = binding.courseDropdown;
 
+        userID = ((MainActivity) requireActivity()).getEmail();
+        System.out.println("Current email " + userID);
+
         //update Spinner on Startup Please dear god don't break
         DocumentReference getDropdown = db.collection("Students")
                 .document(userID);
+
         getDropdown.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
