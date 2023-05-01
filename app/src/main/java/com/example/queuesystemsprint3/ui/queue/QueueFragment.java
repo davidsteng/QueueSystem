@@ -191,7 +191,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
                     if (task.isSuccessful()) {
                         DocumentReference getCourseInfo = db.collection("Courses")
                                 .document(CourseID);
-                        Integer pos = (Integer) task.getResult().get("totalQueueSize");
+                        Long pos = (Long) task.getResult().get("totalQueueSize");
                         Map<String, Object> QueueSize = new HashMap<>();
                         QueueSize.put(userID, pos);
                         courseQueueUpdate.update("QueueOnJoin", QueueSize);
