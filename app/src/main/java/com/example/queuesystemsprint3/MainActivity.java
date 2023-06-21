@@ -37,4 +37,11 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
+    public String getEmail() {
+        Intent intent = getIntent();
+        String email = intent.getStringExtra("email");
+        System.out.println("Email from login " + email);
+        return email;
+    }
+
 }
