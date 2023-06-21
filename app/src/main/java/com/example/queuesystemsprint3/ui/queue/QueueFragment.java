@@ -109,9 +109,11 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onClick(View view) {
                 //System.out.println("Join Queue Button Flag");
-                String dropdownSelect = courseDropdown.getSelectedItem().toString();
+                String dropdownSelect = "";
+                dropdownSelect = courseDropdown.getSelectedItem().toString();
+                System.out.println(courseDropdown.getSelectedItem().toString());
                 //If Spinner empty exit the button input
-                if(dropdownSelect == null) {
+                if(dropdownSelect == null || dropdownSelect.equals("")) {
                     //Insert torch response?
                     return;
                 }
@@ -150,7 +152,7 @@ public class QueueFragment extends Fragment implements View.OnClickListener{
                     if (task.isSuccessful()) {
                         DocumentReference getCourseInfo = db.collection("Courses")
                                 .document(CourseID);
-                        Integer pos = (Integer) task.getResult().get("totalQueueSize");
+                        Long pos = (Long) task.getResult().get("totalQueueSize");
                         Map<String, Object> QueueSize = new HashMap<>();
                         QueueSize.put(userID, pos);
                         courseQueueUpdate.update("QueueOnJoin", QueueSize);
